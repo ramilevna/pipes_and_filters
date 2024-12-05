@@ -1,34 +1,29 @@
-import sys
+import pika
 import json
-import subprocess
+from flask import Flask, request, jsonify
 
-def api_server(pipe):
-    print("API server running. Send messages as JSON in format {'alias': '...', 'text': '...'}")
-    while True:
-        try:
-            data = input("Enter message (or type 'exit' to stop): ")
-            if data.strip().lower() == "exit":
-                break
-            message = json.loads(data)
-            pipe.write(json.dumps(message) + "\n")
-            pipe.flush()
-        except Exception as e:
-            print(f"Error: {e}")
+app = Flask(__name__)
 
-if __name__ == "__main__":
-    with subprocess.Popen(
-        ["python3", "filter_service.py"],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        text=True,
-    ) as filter_process, subprocess.Popen(
-        ["python3", "screaming_service.py"],
-        stdin=filter_process.stdout,
-        stdout=subprocess.PIPE,
-        text=True,
-    ) as screaming_process, subprocess.Popen(
-        ["python3", "publish_service.py"],
-        stdin=screaming_process.stdout,
-        text=True,
-    ) as publish_process:
-        api_server(filter_process.stdin)
+def send_to_queue(message):
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='messages')
+    channel.basic_publish(exchange='', routing_key='messages', body=json.dumps(message))
+    connection.close()
+
+@app.route('/send', methods=['POST'])
+def send_message():
+    try:
+        data = request.get_json()
+        alias = data.get('alias')
+        text = data.get('text')
+        if not alias or not text:
+            return jsonify({"error": "Alias and text are required"}), 400
+        message = {"alias": alias, "text": text}
+        send_to_queue(message)
+        return jsonify({"message": "Message sent"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(port=5000)
