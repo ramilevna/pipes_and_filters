@@ -1,102 +1,135 @@
+# README.md
+
 # Pipes-and-Filters Messaging System
 
 ## Overview
 
-This project implements a messaging system using the **pipes-and-filters** architectural style. The system processes user messages through a series of independent services, each connected by Unix pipes. The services include:
+This project demonstrates a **pipes-and-filters** architecture for processing user messages. The system sequentially processes messages through independently deployable services, connected via Unix pipes. Each service performs a specific function:
 
-1. **Filter Service**: Filters out messages containing stop-words.
+1. **Filter Service**: Removes messages containing stop-words.
 2. **SCREAMING Service**: Converts messages to uppercase.
-3. **Publish Service**: Mocks sending an email by printing the result.
+3. **Publish Service**: Simulates sending an email.
 
-The implementation is designed to showcase the simplicity and effectiveness of pipes-and-filters for message processing. A load testing script is provided to compare the performance of this approach with an event-driven RabbitMQ-based implementation.
+The project also provides a **load testing script** for evaluating the performance of the pipes-and-filters model.
 
 ---
 
-## System Components
+## System Architecture
+
+The system consists of the following components:
 
 1. **API Server** (`api_server.py`):
-   - Receives JSON messages via user input.
-   - Starts and connects the filter, screaming, and publish services using pipes.
+    - Acts as the entry point for user messages.
+    - Starts and connects the services using Unix pipes.
 2. **Filter Service** (`filter_service.py`):
-   - Discards messages containing stop-words: `bird-watching`, `ailurophobia`, `mango`.
+    - Filters out messages containing any of the stop-words:
+        - `bird-watching`
+        - `ailurophobia`
+        - `mango`
 3. **SCREAMING Service** (`screaming_service.py`):
-   - Converts the message text to uppercase.
+    - Converts all message text to uppercase.
 4. **Publish Service** (`publish_service.py`):
-   - Simulates sending an email by printing the message.
+    - Simulates sending an email, printing the final processed message.
 5. **Utilities** (`utils.py`):
-   - Helper functions for reading from and writing to pipes.
-6. **Load Testing** (`load_test.py`):
-   - Measures the performance of the pipes-and-filters implementation.
+    - Provides helper functions for reading and writing data between pipes.
+6. **Load Testing Script** (`load_test.py`):
+    - Simulates a high volume of messages to assess the performance of the system.
 
 ---
 
 ## Prerequisites
 
-- Python 3.6+
-- Unix-based operating system (or Windows with a Unix-compatible shell).
-- Optional: Use a virtual environment for dependency management.
+- Python 3.6 or newer.
+- Unix-based operating system (or Windows with a Unix compatibility layer like WSL or Cygwin).
+- Optional: A virtual environment for managing dependencies.
 
 ---
 
-## How to Run
+## How to Run the System
 
-### Start the Pipes-and-Filters System
+### **Starting the Pipes-and-Filters System**
 
-1. Run the API server to start the system:
-   ```bash
-   python3 api_server.py
-   
-2. Follow the prompts to enter JSON messages:
-	Example input:
-{"alias": "professor", "text": "This is a test message"}
-3.	Observe the output at each stage:
-	•	Filter Service: Filters stop-words.
-	•	SCREAMING Service: Converts text to uppercase.
-	•	Publish Service: Prints the final message.
-4. To exit the system, type exit when prompted.
+1. **Run the API server**:
+    
+    `python3 api_server.py`
+    
+2. **Follow the prompts** to enter messages in JSON format:
+*Example input:*
+    
+    `{"alias": "professor", "text": "This is a test message"}`
+    
+3. **Observe the output**:
+    - Filter Service: Filters messages with stop-words.
+    - SCREAMING Service: Converts text to uppercase.
+    - Publish Service: Prints the final processed message as a mock email.
+4. To exit the system, type `exit` when prompted.
 
+---
 
-Testing Individual Services
+### **Testing Individual Services**
 
 Each service can be tested independently using Unix pipes:
 
-Filter Service
+### **Filter Service**
 
-   echo '{"alias": "user", "text": "hello mango"}' | python3 filter_service.py
+`echo '{"alias": "user", "text": "hello mango"}' | python3 filter_service.py`
 
-Expected: No output, as the message contains a stop-word.
+**Expected Output**: No output, as the message contains a stop-word.
 
-SCREAMING Service
+---
 
-    echo '{"alias": "user", "text": "hello world"}' | python3 screaming_service.py
+### **SCREAMING Service**
 
-Expected:
-{"alias": "user", "text": "HELLO WORLD"}
+`echo '{"alias": "user", "text": "hello world"}' | python3 screaming_service.py`
 
-Publish Service
+**Expected Output**:
 
-echo '{"alias": "user", "text": "HELLO WORLD"}' | python3 publish_service.py
+`{"alias": "user", "text": "HELLO WORLD"}`
 
-Expected: Prints the mock email:
+---
 
-Sending email:
+### **Publish Service**
+
+`echo '{"alias": "user", "text": "HELLO WORLD"}' | python3 publish_service.py`
+
+**Expected Output**:
+
+`Sending email:
 From user: user
-Message: HELLO WORLD
+Message: HELLO WORLD`
 
-Performance Testing
+---
 
-1.	Run the load testing script to simulate a high volume of messages:
+### **Performance Testing**
 
-python3 load_test.py
+1. **Run the load testing script** to simulate a high message volume:
+    
+    `python3 load_test.py`
+    
+2. **Adjust the number of messages** in the script by modifying the `message_count` variable.
+3. Observe performance metrics, including:
+    - Time taken to process all messages.
+    - System resource usage (CPU, memory, etc.).
 
-2.	Adjust the number of messages in load_test.py by modifying the message_count variable.
-3.  Observe the performance metrics, including:
-	•	Time taken to process all messages.
-	•	System resource utilization (e.g., CPU, memory).
+---
 
-Notes on Stop-Words
+## System Notes
 
-Messages containing the following words will be discarded by the Filter Service:
-	•	bird-watching
-	•	ailurophobia
-	•	mango
+1. **Stop-Words**:
+    - Messages containing the following words are discarded by the Filter Service:
+        - `bird-watching`
+        - `ailurophobia`
+        - `mango`
+2. **Scalability**:
+    - This implementation uses Unix pipes for inter-service communication.
+    - Each service is an independent process and can be scaled horizontally by deploying multiple instances.
+3. **Debugging**:
+    - To debug individual services, you can direct input to a service using a pipe and observe the output as shown above.
+
+---
+
+## Future Enhancements
+
+- **Event-Driven Model**: Reimplement the system with RabbitMQ for distributed and asynchronous communication.
+- **Error Handling**: Add robust error-handling mechanisms for unexpected inputs.
+- **Logging**: Include centralized logging for better observability.
