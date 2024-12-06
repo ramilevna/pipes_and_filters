@@ -116,3 +116,13 @@ This system is designed using the **Pipes-and-Filters** architectural pattern an
 # DEMO
 
 https://drive.google.com/file/d/1nIcUwDDrR7zj-G2oBLpWHy05CVDk2E_w/view?usp=sharing
+
+# Team 28:
+
+Daniil Prostiruk ([d.prostiruk@innopolis.university](mailto:d.prostiruk@innopolis.university))
+
+Artem Volkonitin ([a.volkonitin@innopolis.university](mailto:a.volkonitin@innopolis.university))
+
+Daria Shibkova ([d.shibkova@innopolis.university](mailto:d.shibkova@innopolis.university))
+
+Renata Latypova ([r.latypova@innopolis.university](mailto:r.latypova@innopolis.university))
