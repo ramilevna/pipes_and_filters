@@ -112,3 +112,7 @@ The **Pipes-and-Filters** pattern enables clear separation of concerns, while an
 ## Conclusion
 
 This system is designed using the **Pipes-and-Filters** architectural pattern and **RabbitMQ** as the message broker. Each service (filter) is independent, and messages flow through the system sequentially, with transformations occurring at each step. The system is modular, extensible, and scalable, making it suitable for various message processing use cases.
+
+# DEMO
+
+https://drive.google.com/file/d/1nIcUwDDrR7zj-G2oBLpWHy05CVDk2E_w/view?usp=sharing
